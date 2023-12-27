@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Avarage capacity - Result {% endblock %}
+{% block content%}
+
+
+<div id="tabledesign">
+    <div id="tile">
+        <p>It turns out that among the countries you have chosen, the top league of <b>{{ highest }}</b>  has the highest average stadium capacity. Take a look at the table below: </p>
+    </div>
+        {% for table in tables %}
+        			{{ table|safe }}
+        {% endfor %}
+        <br />
+        <p>In addition, see what are the top five countries that users choose:</p>
+        <br />
+    <iframe width="600" height="450" src="https://datastudio.google.com/embed/reporting/b3e3ec7d-47b3-486a-b326-d595322b29d7/page/N62oC" frameborder="0" style="border:0" allowfullscreen></iframe>
+<br /><br /><br />
+</div>
+{% endblock %}
