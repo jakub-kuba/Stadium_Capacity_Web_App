@@ -27,17 +27,11 @@ def get_countries(myfile):
     countries = mydict
     return countries, keys
 
-
 MYFILE = "countries_dict.json"
 ADDRESS = 'http://stadiony.net/stadiony/'
 
 open_file(MYFILE, "r")
 countries, keys = get_countries(MYFILE)
-
-
-@app.route('/test')
-def test():
-    return render_template('test.html')
 
 
 @app.route('/', methods=['GET'])
@@ -48,16 +42,8 @@ def capacity():
 @app.route('/cap', methods=['POST'])
 def capacity_result():
 
-    def create_df():
-        """Creates dataframe with two columns"""
-        column_names = ['League', 'Capacity']
-        new_df = pd.DataFrame(columns=column_names)
-        new_df['Capacity'] = new_df['Capacity'].astype('int32')
-        return new_df
-    
-
     def get_address(countries, selected, address):
-        """Returns the address of the selected country."""
+        """Returns the address of the selected country"""
         code = countries.get(selected)
         cou = pd.read_html(address+code)
         return cou
@@ -79,11 +65,12 @@ def capacity_result():
         df['Capacity'] = df['Capacity'].astype('int64')
         cap = round(df['Capacity'].mean())
         return cap
+    
 
-    df_list = []
+    def format_capacity(capacity):
+        """Formats the Capacity column"""
+        return f"{capacity // 1000:,} {capacity % 1000:03d}"
 
-    new_df = create_df()
-    number = 0
     country1 = request.form.get("country1")
     country2 = request.form.get("country2")
     country3 = request.form.get("country3")
@@ -96,6 +83,9 @@ def capacity_result():
         print("Not all countries selected!")
         error_message = "All five countries must be selected"
         return render_template('index.html', countries=keys, error_message=error_message)
+
+    df_list = []
+    number = 0
     
     for n in countries_selected:
         selected = n
@@ -114,19 +104,16 @@ def capacity_result():
 
     new_df = pd.DataFrame.from_records(df_list)
     new_df = new_df.sort_values(by=['Capacity'], ascending=False).reset_index(drop=True)
-
     new_df['Rank'] = [1, 2, 3, 4, 5] 
     new_df = new_df[['Rank', 'League', 'Capacity']]
     highest = new_df.iloc[0]['League']
 
-    print("new_df:", new_df)
-
+    print("new_df:", new_df, type(new_df))
 
     glob_df = new_df.copy()
-    
-    new_df['Capacity'] = new_df['Capacity'].astype(str)
-    new_df["Capacity"] = new_df["Capacity"].str.slice(stop=-3) + " " + new_df["Capacity"].str.slice(start=-3)
 
+    new_df['Capacity'] = new_df['Capacity'].apply(format_capacity)
+    
 
     try:
         glob_df
