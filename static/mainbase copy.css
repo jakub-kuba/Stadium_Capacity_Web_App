@@ -40,6 +40,7 @@ body
 	height: 56px;
 	margin: auto;
 	background-color:#444444;
+	text-align: center;
 	border-style: solid;
 	border-width: 0px;
 	border-radius: 10px;
@@ -50,7 +51,9 @@ body
 {
 	width: 948px;
 	margin: auto;
+	text-align: letter-spacing;
 	background-color:#444444;
+	float: center;
 	border-style: solid;
 	border-width: 0px;
 	border-radius: 10px;
@@ -70,6 +73,16 @@ a.fontlink:hover
 }
 
 #tile
+{
+	text-align: justify;
+    font-size: 16.5px;
+	padding-top: 20px;
+	padding-left: 40px;
+	padding-right: 40px;
+	padding-bottom: 20px;
+}
+
+#tile1
 {
 	text-align: justify;
     font-size: 16.5px;
@@ -102,6 +115,51 @@ a.fontlink:hover
 {
 	background-color: #ababab;
 	border-radius: 10px;
+}
+
+.tile1
+{
+	border-radius: 10px;
+	width: 472px;
+	margin-left: 3px;
+	margin-right: 2px;
+	margin-bottom: 4px;
+	height: 190px;
+	background-color: #444444;
+	float: left;
+	text-align: center;
+	line-height: 190px;
+	font-family: 'Iceland', cursive;
+	font-size: 65px;
+}
+
+
+.tile2
+{
+	border-radius: 10px;
+	width: 472px;
+	margin-left: 2px;
+	margin-right: 3px;
+	margin-bottom: 4px;
+	height: 190px;
+	background-color: #444444;
+	float: left;
+	text-align: center;
+	line-height: 190px;
+	font-family: 'Iceland', cursive;
+	font-size: 65px;
+}
+
+
+.tile1:hover, .tile2:hover
+{
+	background-color:#ababab;
+}
+
+.tile1 a, .tile2 a
+{
+	color:#ffffff;
+	text-decoration: none;
 }
 
 .select
@@ -154,7 +212,7 @@ table
 {
 	 border-collapse: separate;
 	 border-spacing: 1px;
-	 width: 600px;
+	 width: 58%;
 	 margin: 0 auto;
 }
 
@@ -187,6 +245,10 @@ tr td:nth-child(2)
    text-align: justify;
 }
 
+tr td:nth-child(6) 
+{
+   text-align: justify;
+}
 
 .footer
 {
