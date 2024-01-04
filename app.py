@@ -3,7 +3,7 @@ import pandas as pd
 from datetime import datetime
 import json
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import create_engine
+from urllib.error import HTTPError
 
 app = Flask(__name__)
 
@@ -15,11 +15,11 @@ dbname = 'capacity'
 
 db_credentials = f"{dialect_driver}://{username}:{password}@{host}/{dbname}"
 
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://username:password@localhost/capacity'
 app.config['SQLALCHEMY_DATABASE_URI'] = db_credentials
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
+
 
 class Countries(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -35,7 +35,9 @@ def create_table():
 def send_to_db(df):
     """Updates database"""
     for index, row in df.iterrows():
-        new_entry = Countries(country=row['country'], capacity=row['capacity'], date=row['date'])
+        new_entry = Countries(country=row['country'],
+                              capacity=row['capacity'],
+                              date=row['date'])
         db.session.add(new_entry)
     db.session.commit()
 
@@ -105,7 +107,6 @@ def capacity_result():
         """Formats the Capacity column"""
         return f"{capacity // 1000:,} {capacity % 1000:03d}"
 
-
     country1 = request.form.get("country1")
     country2 = request.form.get("country2")
     country3 = request.form.get("country3")
@@ -127,10 +128,10 @@ def capacity_result():
         selected = n
         try:
             myaddress = get_address(countries, selected, ADDRESS)
-        except:
+        except (HTTPError, ImportError):
             country_error = (
                 "Source website error. "
-                "Please try again or select a country other than "
+                "Please try again later or select a country other than "
                 + n + "."
                 )
             return render_template('index.html', countries=keys,
@@ -149,27 +150,13 @@ def capacity_result():
     new_df = new_df[['Rank', 'League', 'Capacity']]
     highest = new_df.iloc[0]['League']
 
-
     db_df = new_df.copy()
     db_df['date'] = datetime.now()
     db_df['date'] = pd.to_datetime(db_df["date"].dt.strftime('%Y-%m-%d'))
     db_df = db_df.rename(columns={'League': 'country', 'Capacity': 'capacity'})
     db_df = db_df.drop('Rank', axis=1)
 
-    print("db_df:", db_df)
-
-    send_to_db(db_df)
-
-    glob_df = new_df.copy()
-
     new_df['Capacity'] = new_df['Capacity'].apply(format_capacity)
-
-    try:
-        glob_df
-    except:
-        glob_error = "Server error. Please try again"
-        return render_template('index.html',
-                               countries=keys, glob_error=glob_error)
 
     if len(countries_selected) != len(set(countries_selected)):
         error_statement = "You cannot select a country more than once!"
@@ -177,6 +164,7 @@ def capacity_result():
         return render_template('index.html',
                                countries=keys, error_statement=error_statement)
     else:
+        send_to_db(db_df)
         return render_template('cap.html',
                                tables=[new_df.to_html(index=False)],
                                highest=highest)
@@ -184,5 +172,3 @@ def capacity_result():
 
 if __name__ == '__main__':
     app.run(debug=True)
-
-
