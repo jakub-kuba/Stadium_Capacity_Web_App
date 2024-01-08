@@ -2,44 +2,15 @@ from flask import Flask, render_template, request
 import pandas as pd
 from datetime import datetime
 import json
-from flask_sqlalchemy import SQLAlchemy
 from urllib.error import HTTPError
+from database import configure_database, create_table, send_to_db
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = Flask(__name__)
 
-dialect_driver = 'postgresql'
-username = 'postgres'
-password = "p23a"
-host = 'localhost'
-dbname = 'capacity'
-
-db_credentials = f"{dialect_driver}://{username}:{password}@{host}/{dbname}"
-
-app.config['SQLALCHEMY_DATABASE_URI'] = db_credentials
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
-db = SQLAlchemy(app)
-
-
-class Countries(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    country = db.Column(db.String(255), nullable=False)
-    capacity = db.Column(db.Integer, nullable=False)
-    date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-
-
-def create_table():
-    db.create_all()
-
-
-def send_to_db(df):
-    """Updates database"""
-    for index, row in df.iterrows():
-        new_entry = Countries(country=row['country'],
-                              capacity=row['capacity'],
-                              date=row['date'])
-        db.session.add(new_entry)
-    db.session.commit()
+configure_database(app)
 
 
 def open_file(file_name, mode):
