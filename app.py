@@ -40,6 +40,13 @@ mydict = open_file(MYFILE, "r")
 countries, keys = get_countries(mydict)
 
 
+def get_address(countries, selected, address):
+    """Returns the address of the selected country"""
+    code = countries.get(selected)
+    cou = pd.read_html(address+code)
+    return cou
+
+
 @app.route('/', methods=['GET'])
 def capacity():
     create_table()
@@ -48,12 +55,6 @@ def capacity():
 
 @app.route('/cap', methods=['POST'])
 def capacity_result():
-
-    def get_address(countries, selected, address):
-        """Returns the address of the selected country"""
-        code = countries.get(selected)
-        cou = pd.read_html(address+code)
-        return cou
 
     def league_level(country):
         """Determines which table relates to the best league"""
