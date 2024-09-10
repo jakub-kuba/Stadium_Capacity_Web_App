@@ -2,6 +2,7 @@ from flask import Flask, render_template, request
 import pandas as pd
 from datetime import datetime
 import json
+import requests
 from urllib.error import HTTPError
 from database import configure_database, create_table, send_to_db
 from dotenv import load_dotenv
@@ -41,10 +42,17 @@ countries, keys = get_countries(mydict)
 
 
 def get_address(countries, selected, address):
-    """Returns the address of the selected country"""
+    """Return the address of the selected country."""
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+    }
     code = countries.get(selected)
-    cou = pd.read_html(address+code)
-    return cou
+    response = requests.get(address+code, headers=headers)
+    if response.status_code == 200:
+        cou = pd.read_html(response.text)
+        return cou
+    else:
+        print(f"Failed to retrieve page. Status code: {response.status_code}")
 
 
 @app.route('/', methods=['GET'])
