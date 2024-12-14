@@ -32,5 +32,5 @@ SQLAlchemy==2.0.24
 tomli==2.0.1
 typing_extensions==4.9.0
 urllib3==2.2.2
-Werkzeug==2.2.0
+Werkzeug==3.0.6
 zipp==3.17.0
